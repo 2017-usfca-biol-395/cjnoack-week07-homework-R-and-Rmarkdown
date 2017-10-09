@@ -1,7 +1,7 @@
 ---
 title: "Analysis of BLAST Results"
-author: "Don Francisco"
-date: "October 6, 2017"
+author: "Chelsea Noack"
+date: "October 9, 2017"
 output: github_document
 ---
 
