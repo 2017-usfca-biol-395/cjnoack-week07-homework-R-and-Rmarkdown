@@ -176,11 +176,11 @@ joined_blast_data_metadata %>%
 
 In Tables 1 & 2, the top three skin-associated bacterial communities found on females and males tested are listed in descending order. We see Acidovorax sp. appearing in both tables, while females showing less occurances of bacteria versus men, despite having a higher percent identity match.
 
-```{r ggplots}
+```{r ggplots for individual patients}
 ggplot(joined_blast_data_metadata ,
-  aes(x=sex_s ,
-      y=pident)) +
-    geom_jitter(alpha = 0.1)
+  aes(x = pident)) +
+  geom_histogram() +
+facet_grid(sex_s~host_subject_id_s)
 ```
 
 DISCUSSION HERE
