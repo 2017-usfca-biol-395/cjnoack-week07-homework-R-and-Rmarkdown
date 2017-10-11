@@ -178,9 +178,17 @@ In Tables 1 & 2, the top three skin-associated bacterial communities found on fe
 
 ```{r ggplots for individual patients}
 ggplot(joined_blast_data_metadata ,
-  aes(x = pident)) +
-  geom_histogram() +
-facet_grid(sex_s~host_subject_id_s)
+  aes(x = mismatch,
+      fill = sample_type_s)) +
+  geom_density(alpha=0.8) +
+facet_wrap(~host_subject_id_s)
+
+ggplot(joined_blast_data_metadata ,
+  aes(x = length,
+      fill = sample_type_s)) +
+  geom_density(alpha=0.8) +
+facet_wrap(~host_subject_id_s)
+
 ```
 
 DISCUSSION HERE
