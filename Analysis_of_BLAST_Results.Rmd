@@ -1,19 +1,25 @@
 ---
 title: "Analysis of BLAST Results"
 author: "Chelsea Noack"
-date: "October 9, 2017"
+date: "October 11, 2017"
 output: github_document
 ---
 
 # Introduction
 
-Add 1-2 paragraphs here.
+Microbial communities within the enviornment span from sizes of large to small and are often predicted by "pairwise interactions" between the different species within the community. As bacterial species interact with one another, they in turn affect the health of their host. In that same vein, forensic studies can be helped by further understanding bacterial-host interactions. Skin-associated bacterial communities are highly diverse, yet personalized, which indicates a possibility for their use in forensic studies. 
+
+In a study done by Fierer et al., skin-associated bacterial communities were gathered from single computer keys and computer mice and hypothesized to determine who owns the objects based on the genetic structures of the bacteria and the individual. By using a high-throughput pyrosequencing technique, Fierer et al. argue that one can confidently compare bacterial communities found on an individual's skin to the objects they use (computer keys and computer mice). 
+
+Sources:
+https://www.ncbi.nlm.nih.gov/pubmed/27551280
+https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?study=ERP022657
 
 # Methods
 
 ## Sample origin and sequencing
 
-Add about a paragraph here.
+ONE PARAGRAPH FROM STUDY HERE. 
 
 ## Computational
 
@@ -128,13 +134,18 @@ joined_blast_data_metadata <- metadata_in %>%
 # which data to use, because that's piped in, but we do have to give the
 # hist() function the title and axis label we'd like to use for the figure
 joined_blast_data_metadata %>%
-  filter(env_material_s == "sebum") %>%
+  filter(sex_s == "male") %>%
   pull(pident) %>%
-  hist(main = "Percent Identity",
+  hist(main = "Percent Identity in Males",
+       xlab = "Percent")
+joined_blast_data_metadata %>%
+  filter(sex_s == "female") %>%
+  pull(pident) %>%
+  hist(main = "Percent Identity in Females",
        xlab = "Percent")
 ```
 
-Don't forget to report what your figures show in words, here in the Results section.
+Figure 1 shows the percent identity match for the five male participants in the study, who were all healthy and 20-35 years old. 
 
 ```{r summary-table}
 # Finally, we'd like to be able to make a summary table of the counts of
