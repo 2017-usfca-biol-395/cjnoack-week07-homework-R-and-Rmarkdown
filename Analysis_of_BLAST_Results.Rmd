@@ -9,7 +9,7 @@ output: github_document
 
 Microbial communities within the enviornment span from sizes of large to small and are often predicted by "pairwise interactions" between the different species within the community. As bacterial species interact with one another, they in turn affect the health of their host. In that same vein, forensic studies can be helped by further understanding bacterial-host interactions. Skin-associated bacterial communities are highly diverse, yet personalized, which indicates a possibility for their use in forensic studies. 
 
-In a study done by Fierer et al., skin-associated bacterial communities were gathered from single computer keys and computer mice and hypothesized to determine who owns the objects based on the genetic structures of the bacteria and the individual. By using a high-throughput pyrosequencing technique, Fierer et al. argue that one can confidently compare bacterial communities found on an individual's skin to the objects they use (computer keys and computer mice). 
+In a study done by Fierer et al., skin-associated bacterial communities were gathered from single computer keys and computer mice and hypothesized to determine who owns the objects based on the genetic structures of the bacteria and the individual. By using a high-throughput pyrosequencing technique, Fierer et al. argue that one can confidently compare bacterial communities found on an individual's skin to the objects they use (computer keys and computer mice). My analysis asks specifically how do men and women's skin-associated bacterial communities from this study differ? How are they similar? I hypothesize they will differ most in which bacterial communities they have and how long the sequence lengths will be. 
 
 Sources:
 https://www.ncbi.nlm.nih.gov/pubmed/27551280
@@ -19,7 +19,7 @@ https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?study=ERP022657
 
 ## Sample origin and sequencing
 
-ONE PARAGRAPH FROM STUDY HERE. 
+10 students were used for the experiment from  
 
 ## Computational
 
@@ -42,7 +42,7 @@ library("knitr")
 library("ggplot2")
 ```
 
-```{r make-read-in-data-function}
+```{r make-read-in-data-function, echo=FALSE}
 # Output format from BLAST is as detailed on:
 # https://www.ncbi.nlm.nih.gov/books/NBK279675/
 # In this case, we used: '10 sscinames std'
@@ -88,7 +88,7 @@ read_blast_output <- function(filename) {
 }
 ```
 
-```{r read-in-BLAST-data}
+```{r read-in-BLAST-data, echo=FALSE}
 # this makes a vector of all the BLAST output file names, including
 # the name(s) of the directories they are in
 files_to_read_in <- list.files(path = "output/blast",
@@ -109,7 +109,7 @@ for (filename in files_to_read_in) {
 }
 ```
 
-```{r read-in-metadata-and-join}
+```{r read-in-metadata-and-join, echo=FALSE}
 # Next we want to read in the metadata file so we can add that in too
 # This is not a csv file, so we have to use a slightly different syntax
 # here the `sep = "\t"` tells the function that the data are tab-delimited
@@ -131,7 +131,7 @@ joined_blast_data_metadata <- metadata_in %>%
 ```
 
 
-```{r Histograms for female and male pident}
+```{r histograms-for-female-and-male-pident, echo=FALSE}
 # Here we're using the dply piping syntax to select a subset of rows matching a
 # criteria we specify (using the filter) function, and then pull out a column
 # from the data to make a histogram. We don't need to tell the hist() function
@@ -153,9 +153,12 @@ joined_blast_data_metadata %>%
        xlab = "Percent")
 ```
 
-In Figures 1 and 2, we see the overall percent identity match for female and male skin samples. Noticeably, the female percent identity match is much larger than males. This is curious, so we decided to see which skin-associated microbrial communities were more common for both females and males. 
+In **Figures 1 and 2**, we see the overall percent identity match for female and male skin samples. Noticeably, the female percent identity match is much larger than males. This is curious, so we decided to see which skin-associated microbrial communities were more common for both females and males. 
 
-```{r Tables for top 3 species in females and males}
+
+### Top 3 Species Shown in Females
+
+```{r tables-top3-females}
 joined_blast_data_metadata %>%
   filter(sex_s == "female") %>%
   filter(env_material_s == "sebum") %>%
@@ -164,6 +167,13 @@ joined_blast_data_metadata %>%
   arrange(desc(n)) %>%
   head (3) %>%
   kable()
+```
+
+**Table 1**: ANALYSIS HERE
+
+### Top 3 Species Shown in Males
+
+```{r tables-top3-males}
 joined_blast_data_metadata %>%
   filter(sex_s == "male") %>%
   filter(env_material_s == "sebum") %>%
@@ -174,15 +184,23 @@ joined_blast_data_metadata %>%
   kable()
 ```
 
-In Tables 1 & 2, the top three skin-associated bacterial communities found on females and males tested are listed in descending order. We see Acidovorax sp. appearing in both tables, while females showing less occurances of bacteria versus men, despite having a higher percent identity match.
+**Table 2**: ANALYSIS HERE
 
-```{r ggplots for individual patients}
+### Individual Mismatch Comparison 
+
+```{r ggplots-individual-mismatch}
 ggplot(joined_blast_data_metadata ,
   aes(x = mismatch,
       fill = sample_type_s)) +
   geom_density(alpha=0.8) +
 facet_wrap(~host_subject_id_s)
+```
 
+**Figure 3**
+
+### Individual Length Comparison
+
+```{r ggplots-individual-length}
 ggplot(joined_blast_data_metadata ,
   aes(x = length,
       fill = sample_type_s)) +
@@ -191,7 +209,11 @@ facet_wrap(~host_subject_id_s)
 
 ```
 
-DISCUSSION HERE
+**Figure 4**
+
+## Discussion ##
+
+The results from the study are complex, while some of the data might be easier to comprehend, there are gaps in understanding when it comes to other aspects. 
 
 ```{r summary-table}
 # Finally, we'd like to be able to make a summary table of the counts of
