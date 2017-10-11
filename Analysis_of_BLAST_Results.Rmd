@@ -23,7 +23,10 @@ ONE PARAGRAPH FROM STUDY HERE.
 
 ## Computational
 
-And another paragraph or two here.
+FASTqc, 
+trim,
+blast,
+organize
 
 # Results
 
@@ -128,7 +131,7 @@ joined_blast_data_metadata <- metadata_in %>%
 ```
 
 
-```{r histograms}
+```{r Histograms for female and male pident}
 # Here we're using the dply piping syntax to select a subset of rows matching a
 # criteria we specify (using the filter) function, and then pull out a column
 # from the data to make a histogram. We don't need to tell the hist() function
@@ -150,6 +153,8 @@ joined_blast_data_metadata %>%
        xlab = "Percent")
 ```
 
+In Figures 1 and 2, we see the overall percent identity match for female and male skin samples. Noticeably, the female percent identity match is much larger than males. This is curious, so we decided to see which skin-associated microbrial communities were more common for both females and males. 
+
 ```{r Tables for top 3 species in females and males}
 joined_blast_data_metadata %>%
   filter(sex_s == "female") %>%
@@ -169,17 +174,13 @@ joined_blast_data_metadata %>%
   kable()
 ```
 
+In Tables 1 & 2, the top three skin-associated bacterial communities found on females and males tested are listed in descending order. We see Acidovorax sp. appearing in both tables, while females showing less occurances of bacteria versus men, despite having a higher percent identity match.
+
 ```{r ggplots}
-joined_blast_data_metadata %>%
-  filter(sex_s == "female") %>%
-  filter(env_material_s == "sebum") %>%
-  group_by(sscinames) %>%
-  count() %>%
-  arrange(desc(n)) %>%
-  head (3) %>%
-  ggplot(aes(x=sscinames,
-             y = n)) +
-    geom_bar(stat = "Identity")
+ggplot(joined_blast_data_metadata ,
+  aes(x=sex_s ,
+      y=pident)) +
+    geom_jitter(alpha = 0.1)
 ```
 
 DISCUSSION HERE
