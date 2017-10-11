@@ -8,7 +8,7 @@ Introduction
 
 Microbial communities within the enviornment span from sizes of large to small and are often predicted by "pairwise interactions" between the different species within the community. As bacterial species interact with one another, they in turn affect the health of their host. In that same vein, forensic studies can be helped by further understanding bacterial-host interactions. Skin-associated bacterial communities are highly diverse, yet personalized, which indicates a possibility for their use in forensic studies.
 
-In a study done by Fierer et al., skin-associated bacterial communities were gathered from single computer keys and computer mice and hypothesized to determine who owns the objects based on the genetic structures of the bacteria and the individual. By using a high-throughput pyrosequencing technique, Fierer et al. argue that one can confidently compare bacterial communities found on an individual's skin to the objects they use (computer keys and computer mice).
+In a study done by Fierer et al., skin-associated bacterial communities were gathered from single computer keys and computer mice and hypothesized to determine who owns the objects based on the genetic structures of the bacteria and the individual. By using a high-throughput pyrosequencing technique, Fierer et al. argue that one can confidently compare bacterial communities found on an individual's skin to the objects they use (computer keys and computer mice). My analysis asks specifically how do men and women's skin-associated bacterial communities from this study differ? How are they similar? I hypothesize they will differ most in which bacterial communities they have and how long the sequence lengths will be.
 
 Sources: <https://www.ncbi.nlm.nih.gov/pubmed/27551280> <https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?study=ERP022657>
 
@@ -18,7 +18,7 @@ Methods
 Sample origin and sequencing
 ----------------------------
 
-ONE PARAGRAPH FROM STUDY HERE.
+10 students were used for the experiment from
 
 Computational
 -------------
@@ -45,124 +45,11 @@ library("knitr")
 library("ggplot2")
 ```
 
-``` r
-# Output format from BLAST is as detailed on:
-# https://www.ncbi.nlm.nih.gov/books/NBK279675/
-# In this case, we used: '10 sscinames std'
-# 10 means csv format
-# sscinames means unique Subject Scientific Name(s), separated by a ';'
-# std means the standard set of result columns, which are:
-# 'qseqid sseqid pident length mismatch
-# gapopen qstart qend sstart send evalue bitscore',
+![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/histograms-for-female-and-male-pident-1.png)![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/histograms-for-female-and-male-pident-2.png)
 
+In **Figures 1 and 2**, we see the overall percent identity match for female and male skin samples. Noticeably, the female percent identity match is much larger than males. This is curious, so we decided to see which skin-associated microbrial communities were more common for both females and males.
 
-# this function takes as input a quoted path to a BLAST result file
-# and produces as output a dataframe with proper column headers
-# and the 'qseqid' column split into sample and seq number
-read_blast_output <- function(filename) {
-  data_in <- read.csv(filename,
-                      header = FALSE, # files don't have column names in them
-                      col.names = c("sscinames", # unique Subject Sci Name(s)
-                                    "qseqid",    # Query Seq-id
-                                    "sseqid",    # Subject Seq-id
-                                    "pident",    # Percntge of identical matches
-                                    "length",    # Alignment length
-                                    "mismatch",  # Number of mismatches
-                                    "gapopen",   # Number of gap openings
-                                    "qstart",    # Start of alignment in query
-                                    "qend",      # End of alignment in query
-                                    "sstart",    # Start of alignment in subj
-                                    "send",      # End of alignment in subject
-                                    "evalue",    # Expect value
-                                    "bitscore"))  # Bit score
-
-  # Next we want to split the query sequence ID into
-  # Sample and Number components so we can group by sample
-  # They originally look like "ERR1942280.1"
-  # and we want to split that into two columns: "ERR1942280" and "1"
-  # we can use the separate() function from the tidyr library to do this
-  # Note that we have to double escape the period for this to work
-  # the syntax is
-  # separate(column_to_separate,
-  # c("New_column_name_1", "New_column_name_2"),
-  # "seperator")
-  data_in <- data_in %>%
-    separate(qseqid, c("sample_name", "sample_number"), "\\.")
-}
-```
-
-``` r
-# this makes a vector of all the BLAST output file names, including
-# the name(s) of the directories they are in
-files_to_read_in <- list.files(path = "output/blast",
-                               full.names = TRUE)
-
-# We need to create an empty matrix with the right number of columns
-# so that we can rbind() each dataset on to it
-joined_blast_data <- matrix(nrow = 0,
-                            ncol = 14)
-
-# now we loop over each of the files in the list and append them
-# to the bottom of the 'joined_blast_data' object
-# we do this with the rbind() function and the function we
-# made earlier to read in the files, read_blast_output()
-for (filename in files_to_read_in) {
-  joined_blast_data <- rbind(joined_blast_data,
-                             read_blast_output(filename))
-}
-```
-
-``` r
-# Next we want to read in the metadata file so we can add that in too
-# This is not a csv file, so we have to use a slightly different syntax
-# here the `sep = "\t"` tells the function that the data are tab-delimited
-# and the `stringsAsFactors = FALSE` tells it not to assume that things are
-# categorical variables
-metadata_in <- read.table(paste0("data/metadata/",
-                                 "fierer_forensic_hand_mouse_SraRunTable.txt"),
-                          sep = "\t",
-                          header = TRUE,
-                          stringsAsFactors = FALSE)
-
-# Finally we use the left_join() function from dplyr to merge or 'join' the
-# combined data and metadata into one big table, so it's easier to work with
-# in R the `by = c("Run_s" = "sample_name")` syntax tells R which columns
-# to match up when joining the datasets together
-joined_blast_data_metadata <- metadata_in %>%
-  left_join(joined_blast_data,
-            by = c("Run_s" = "sample_name"))
-```
-
-``` r
-# Here we're using the dply piping syntax to select a subset of rows matching a
-# criteria we specify (using the filter) function, and then pull out a column
-# from the data to make a histogram. We don't need to tell the hist() function
-# which data to use, because that's piped in, but we do have to give the
-# hist() function the title and axis label we'd like to use for the figure
-
-# Histograms for basic percent identity for females versus males.
-joined_blast_data_metadata %>%
-  filter(sex_s == "female") %>%
-  filter(env_material_s == "sebum") %>%
-  pull(pident) %>%
-  hist(main = "Percent Identity Skin Samples in Females",
-       xlab = "Percent")
-```
-
-![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/Histograms%20for%20female%20and%20male%20pident-1.png)
-
-``` r
-joined_blast_data_metadata %>%
-  filter(sex_s == "male") %>%
-  filter(env_material_s == "sebum") %>%
-  pull(pident) %>%
-  hist(main = "Percent Identity Skin Samples in Males",
-       xlab = "Percent")
-```
-
-![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/Histograms%20for%20female%20and%20male%20pident-2.png)
-
-In Figures 1 and 2, we see the overall percent identity match for female and male skin samples. Noticeably, the female percent identity match is much larger than males. This is curious, so we decided to see which skin-associated microbrial communities were more common for both females and males.
+### Top 3 Species Shown in Females
 
 ``` r
 joined_blast_data_metadata %>%
@@ -181,6 +68,10 @@ joined_blast_data_metadata %>%
 | Acidovorax sp.         |  173|
 | unidentified bacterium |   85|
 
+**Table 1**: ANALYSIS HERE
+
+### Top 3 Species Shown in Males
+
 ``` r
 joined_blast_data_metadata %>%
   filter(sex_s == "male") %>%
@@ -198,7 +89,7 @@ joined_blast_data_metadata %>%
 | Aquitalea sp. KJ011                |   500|
 | Acidovorax sp.                     |   170|
 
-In Tables 1 & 2, the top three skin-associated bacterial communities found on females and males tested are listed in descending order. We see Acidovorax sp. appearing in both tables, while females showing less occurances of bacteria versus men, despite having a higher percent identity match.
+**Table 2**: ANALYSIS HERE
 
 ``` r
 ggplot(joined_blast_data_metadata ,
@@ -208,7 +99,9 @@ ggplot(joined_blast_data_metadata ,
 facet_wrap(~host_subject_id_s)
 ```
 
-![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/ggplots%20for%20individual%20patients-1.png)
+![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/ggplots-individual-mismatch-1.png)
+
+**Figure 3**
 
 ``` r
 ggplot(joined_blast_data_metadata ,
@@ -218,9 +111,12 @@ ggplot(joined_blast_data_metadata ,
 facet_wrap(~host_subject_id_s)
 ```
 
-![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/ggplots%20for%20individual%20patients-2.png)
+![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/ggplots-individual-length-1.png)
 
-DISCUSSION HERE
+**Figure 4**
+
+Discussion
+----------
 
 ``` r
 # Finally, we'd like to be able to make a summary table of the counts of
