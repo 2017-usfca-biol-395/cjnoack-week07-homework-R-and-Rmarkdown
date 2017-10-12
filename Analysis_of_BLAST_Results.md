@@ -18,12 +18,12 @@ Methods
 Sample origin and sequencing
 ----------------------------
 
-10 students were used for the experiment from
+Nine women and men of equivalent age and health (four women, five men) were used for the computer mouse study, all of whom worked in the same building at the University of Colorado. The computer mouse belonging to the individual and the palm of the individual's dominant hand were swabbed. Each computer mouse had been touched by the individual in the last 12 hours. Before sampling, all individuals practiced their regular hygeine routines. They compared the swabs from the nine individuals to swabs from 270 other hands from healthy individuals ranging from 18-40 years old. In each sample, the 16S rRNA genes were amplified then carried out via PCR. If sequences were less than 200 or more than 300 base pairs in length, they were excluded from the study.
 
 Computational
 -------------
 
-FASTqc, trim, blast, organize
+First, the sequences were obtained from the NCBI database which is open for the public. The files were downloaded to a raw data directory. Next, a QC (quality check) report was run on each individual file. The QC reports are helpful to see how viable each sequence is for analysis; if the majority of the sequence is above a 30 score, then we consider it to be sequenced well. Typically, the 3' end will deteriorate, which is normal. Once the files were checked for quality, they were trimmed using Trimmomatic, which discards any sequence less than 150 base pairs or a base score below 25, which is similar to the experiment's desire to exlude any lengths less than 200 base pairs. Once trimmed, the files were converted to fasta files (from fastq) because BLAST will only work on fasta files. Lastly, the fasta files were put through a BLAST analysis.
 
 Results
 =======
@@ -47,7 +47,7 @@ library("ggplot2")
 
 ![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/histograms-for-female-and-male-pident-1.png)![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/histograms-for-female-and-male-pident-2.png)
 
-In **Figures 1 and 2**, we see the overall percent identity match for female and male skin samples. Noticeably, the female percent identity match is much larger than males. This is curious, so we decided to see which skin-associated microbrial communities were more common for both females and males.
+In **Figures 1 and 2**, we see the overall percent identity match frequency for female and male skin samples.
 
 ### Top 3 Species Shown in Females
 
@@ -58,7 +58,7 @@ joined_blast_data_metadata %>%
   group_by(sscinames) %>%
   count() %>%
   arrange(desc(n)) %>%
-  head (3) %>%
+  head(3) %>%
   kable()
 ```
 
@@ -68,7 +68,7 @@ joined_blast_data_metadata %>%
 | Acidovorax sp.         |  173|
 | unidentified bacterium |   85|
 
-**Table 1**: ANALYSIS HERE
+**Table 1**: Shown here are the top three bacterial species found on females in the study.
 
 ### Top 3 Species Shown in Males
 
@@ -79,7 +79,7 @@ joined_blast_data_metadata %>%
   group_by(sscinames) %>%
   count() %>%
   arrange(desc(n)) %>%
-  head (3) %>%
+  head(3) %>%
   kable()
 ```
 
@@ -89,7 +89,9 @@ joined_blast_data_metadata %>%
 | Aquitalea sp. KJ011                |   500|
 | Acidovorax sp.                     |   170|
 
-**Table 2**: ANALYSIS HERE
+**Table 2**: Shown here are the top three bacterial species found on males in the study.
+
+### Individual Mismatch Comparison
 
 ``` r
 ggplot(joined_blast_data_metadata ,
@@ -101,7 +103,9 @@ facet_wrap(~host_subject_id_s)
 
 ![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/ggplots-individual-mismatch-1.png)
 
-**Figure 3**
+**Figure 3**: Shown in the figure is every individuals' mismatch rate for both computer mouse data and right palm data.
+
+### Individual Length Comparison
 
 ``` r
 ggplot(joined_blast_data_metadata ,
@@ -113,10 +117,18 @@ facet_wrap(~host_subject_id_s)
 
 ![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/ggplots-individual-length-1.png)
 
-**Figure 4**
+**Figure 4**: Shown in the figure are comparable sequence lengths between all individuals from both computer mouse data and right palm data.
 
 Discussion
-----------
+==========
+
+The data from the Fierer et al. study are confusing yet interesting. For example, in Figures 1 and 2, we found that the female percent identity match was noticeably much larger than that of males. For females, the identity match was typically above 95%, while in males it was usually 85%. The reason why females have a high percent identity? There's many unsupported reasons why this is the case. Potentially it has something to do with hand washing techniques, or something as simple as the way the swabs were done.
+
+To delve further, I examined the top three bacterial species which showed up in females and males, as there wasn't too much overlap. For females, the most common was Bartonella washoensis with 678 matches. This particular species of bacteria is known to cause meningitis in humans and is often passed virally. However, other sources indicate that its pathophysiology is more commonly related to myocarditis (inflammation of the heart muscle) which is rare in women. The research was confounding until I looked at the second most common bacteria found in women, which was Acidovorax sp (173 occurances). While that species is mainly known for infecting plants, it is also known for causing meningitis, wound infections, and UTIs. The appearance of two bacterial species causing meningitis in the women samples is interesting, but I'm hesitant to make any broad claims based on this limited data on only four female subjects. In the male samples, the top two bacterial species were found either from gills of gutless awning-clams or places with lakes, wetlands, or mud. While the connection is interesting, I don't find it as helpful as the last most common bacteria found, which was again Acidovorax sp. Clearly, within the University of Colorado building there is a common appearance of this particular bacteria found on both female and male hands.
+
+Lastly, I wanted to do a broad comparison between all experiment participants in terms of their sequence mismatch and length. In Figure 3, F7 shows the highest rate of mismatches. Noticeably, men have an even spread of very little mismatches, while females show a visible skew to the left. What is also visible is that when men did have mismatches, it was from the swab done on the right palm, while women primarily had mismatches from the computer mouse data. This could either be experimental error or this could indicate **why** we see such a big difference in percent identity between males and females from Figures 1 & 2. In Figure 4, we see a common skew to the right for both females and males, except arguably subjects M1. We also see the sequence length is typically larger when swabbed from the palm versus the computer mouse, which is interesting, but no well-developed hypotheses about why can be formed at this time.
+
+Overall, future steps this study could take would be swabbing *more* individuals and using other devices touched by others rather than a personal computer. I would argue, however, that studies like these do not indicate that such techniques provide ample support for forensic research because, in real life, there are no controls which you can compare your sequences off of. Unless the forensic team was biased and already had a suspect in mind. Nevertheless, the results of the study are interesting and more can be learned about skin-associated bacterial communities from studies such as these.
 
 ``` r
 # Finally, we'd like to be able to make a summary table of the counts of
@@ -1222,8 +1234,3 @@ kable(table(joined_blast_data_metadata$sscinames,
 | Streptococcus pneumoniae                                          |           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           1|
 | Vogesella perlucida                                               |           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           1|
 | Zoogloea sp. EMB 17                                               |           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           0|           1|
-
-Discussion
-==========
-
-Add 2-3 paragraphs here interpreting your results and considering future directions one might take in analyzing these data.
